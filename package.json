@@ -1,0 +1,12 @@
+{
+  "name": "web-noraneko-guild",
+  "version": "1.0.0",
+  "main": "none",
+  "repository": "https://github.com/eiichi-worker/web-noraneko-guild.git",
+  "author": "eiichi-worker <8284623+eiichi-worker@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "firebase-tools": "^8.2.0"
+  }
+}

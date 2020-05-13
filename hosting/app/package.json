@@ -1,0 +1,24 @@
+{
+  "name": "web-noraneko-guild",
+  "version": "1.0.0",
+  "description": "Noraneko Guild",
+  "author": "eiichi-worker",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@nuxtjs/firebase": "^5.2.0",
+    "firebase": "^7.14.3",
+    "nuxt": "^2.12.2",
+    "vuexfire": "^3.2.2"
+  },
+  "devDependencies": {
+    "@babel/runtime-corejs3": "^7.9.6",
+    "@nuxtjs/vuetify": "^1.11.2",
+    "core-js": "^3.6.5"
+  }
+}
