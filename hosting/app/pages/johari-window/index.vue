@@ -1,12 +1,13 @@
 <template>
   <v-layout column justify-center align-center>
     <v-flex xs12 sm8 md6>
-          <v-btn outlined color="success" to="/johari-window/new">
-            <v-icon left>mdi-plus-box</v-icon> 新しくジョハリの窓を始める
-          </v-btn>
+      <v-btn outlined color="success" to="/johari-window/new">
+        <v-icon left>mdi-plus-box</v-icon> 新しくジョハリの窓を始める
+      </v-btn>
 
       <v-card v-for="item of list" :key="item.id">
-        <p>{{ item.id }}</p>
+        <!-- <p>{{ item.id }}</p> -->
+        <a :href="'/johari-window/' + item.id">{{ item.title }}</a>
       </v-card>
     </v-flex>
   </v-layout>
@@ -20,10 +21,9 @@ export default {
     ...mapGetters({ list: "johariWindow/list" })
   },
   created() {
-// console.log(this);
-this.$store.dispatch("johariWindow/bindList",this);
-console.log(this.list);
-
+    // console.log(this);
+    this.$store.dispatch("johariWindow/bindList", this);
+    console.log(this.list);
   }
 };
 </script>

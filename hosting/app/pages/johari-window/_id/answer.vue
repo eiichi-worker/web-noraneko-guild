@@ -2,17 +2,32 @@
   <v-layout column justify-center align-center>
     <v-flex xs12 sm8 md6>
       <v-card>
-        <h2>答える</h2>
+        <h1>『{{ title }}』に答える</h1>
+        <h2>{{ currentUserEmail }}さん</h2>
 
-        <v-tabs vertical>
-          <v-tab v-for="item in users.list" v-bind:key="item.index">
-            <v-icon left>mdi-account</v-icon>{{ item.userId }}
+        <v-tabs vertical v-if="selected">
+          <v-tab
+            v-for="(selectedVal, userIndex) in selected"
+            v-bind:key="userIndex"
+          >
+            <v-icon left>mdi-account</v-icon
+            >{{ users.list.find(u => u.index == userIndex).email }}
           </v-tab>
-          <v-tab-item v-for="item in users.list" v-bind:key="item.index">
+          <v-tab-item
+            v-for="(selectedVal, userIndex) in selected"
+            v-bind:key="userIndex"
+          >
             <v-card flat>
-              <v-card-title>{{ item.userId }}</v-card-title>
+              <v-card-title
+                >{{ users.list.find(u => u.index == userIndex).email }}
+                {{
+                  currentUserEmail ==
+                  users.list.find(u => u.index == userIndex).email
+                    ? "(自分)"
+                    : "さん"
+                }}をどう思いますか？</v-card-title
+              >
               <v-card-text>
-                {{ selected[item.userId] }}
                 <v-row>
                   <v-col
                     v-for="choice in choices.list"
@@ -24,7 +39,7 @@
                   >
                     <v-card>
                       <v-checkbox
-                        v-model="selected[item.userId]"
+                        v-model="selected[userIndex]"
                         :label="choice.name"
                         :value="choice.index"
                       ></v-checkbox>
@@ -36,8 +51,15 @@
           </v-tab-item>
         </v-tabs>
 
+        <v-btn
+          outlined
+          color="success"
+          :to="'/johari-window/' + $route.params.id + '/'"
+        >
+          <v-icon left>mdi-plus-box</v-icon>後で回答する
+        </v-btn>
         <v-btn color="primary" @click="submit()">
-          回答終了
+          回答を送信する
         </v-btn>
       </v-card>
     </v-flex>
@@ -48,63 +70,57 @@
 export default {
   data: () => {
     return {
+      currentUserEmail: "",
+      title: "",
       users: {
-        list: [
-          { index: 0, userId: "A" },
-          { index: 1, userId: "B" },
-          { index: 2, userId: "C" }
-        ],
-        nextIndex: 3
+        list: [],
+        nextIndex: 0
       },
       choices: {
-        list: [
-          { index: 0, name: "あたまがいい" },
-          { index: 1, name: "やさしい" },
-          { index: 2, name: "威圧感がある" },
-          { index: 3, name: "頑固" },
-          { index: 4, name: "聞き上手" },
-          { index: 5, name: "話し上手" },
-          { index: 6, name: "人見知り" },
-          { index: 7, name: "謙虚" },
-          { index: 8, name: "傲慢" },
-          { index: 9, name: "正義感がある" },
-          { index: 10, name: "思いやりがある" }
-        ],
-        nextIndex: 11
+        list: [],
+        nextIndex: 0
       },
-      selected: {
-        A: [],
-        B: [],
-        C: []
-      }
+      selected: null
     };
   },
   computed: {},
-  created() {},
+  async created() {
+    this.currentUserEmail = this.$store.state.user.email;
+
+    const doc = await this.$store.dispatch("johariWindow/get", {
+      context: this,
+      id: this.$route.params.id
+    });
+    console.log("doc", doc);
+    this.title = doc.title;
+    this.users = doc.users;
+    this.choices = doc.choices;
+
+    if (!doc.selected || !doc.selected[this.currentUserEmail]) {
+      this.selected = {};
+      let newSelected = {};
+      doc.users.list.forEach(user => {
+        newSelected[user.index] = [];
+      });
+      this.selected = newSelected;
+      console.log("this.selected", this.selected);
+    } else {
+      console.error("すでに回答済みです");
+    }
+  },
   methods: {
     async submit() {
-      var userIdList = this.users.list
-        .map(o => {
-          console.log(o);
-
-          return [o.userId];
-        })
-        .reduce((a, b) => {
-          console.log(a, b);
-
-          return a.concat(b);
-        });
-      console.log(userIdList);
-
       // データの登録
-      const res = await this.$store.dispatch("johariWindow/set", {
+      let updateDoc = {
+        id: this.$route.params.id
+      };
+      let currentUserIndex = this.users.list.find(
+        u => u.email == this.currentUserEmail
+      ).index;
+      updateDoc[`selected.${currentUserIndex}`] = this.selected;
+      const res = await this.$store.dispatch("johariWindow/update", {
         context: this,
-        doc: {
-          id: this.$route.params.id,
-          users: userIdList,
-          choices: this.choices,
-          selected: this.selected
-        }
+        doc: updateDoc
       });
 
       // 詳細画面へ遷移

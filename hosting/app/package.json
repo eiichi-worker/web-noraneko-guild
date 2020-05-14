@@ -13,6 +13,7 @@
   "dependencies": {
     "@nuxtjs/firebase": "^5.2.0",
     "firebase": "^7.14.3",
+    "firebaseui": "^4.5.0",
     "nuxt": "^2.12.2",
     "vuexfire": "^3.2.2"
   },

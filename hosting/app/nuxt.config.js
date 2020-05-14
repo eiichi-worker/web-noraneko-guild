@@ -74,17 +74,14 @@ export default {
     // customEnv: false,
     // onFirebaseHosting: false,
     services: {
-      // auth: false,
-      // auth: {
-      //   persistence: "local",
-      //   initialize: {
-      //     onAuthStateChangedMutation: "SET_AUTH_USER",
-      //     onAuthStateChangedAction: null
-      //   },
-      //   ssr: false
-      // },
+      auth: {
+        initialize: {
+          onAuthStateChangedMutation: 'ON_AUTH_STATE_CHANGED_MUTATION',
+          // onAuthStateChangedAction: 'onAuthStateChangedAction'
+        }
+      },
       firestore: true,
-      // functions: false,
+      functions: true,
       // storage: false,
       // realtimeDb: false,
       // performance: false,

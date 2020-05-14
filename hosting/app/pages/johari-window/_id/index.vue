@@ -2,33 +2,55 @@
   <v-layout column justify-center align-center>
     <v-flex xs12 sm8 md6>
       <v-card>
-        <h2>結果</h2>
+        <h1>『{{ title }}』の結果</h1>
 
         <v-tabs vertical>
-          <v-tab v-for="userId in users" v-bind:key="userId">
-            <v-icon left>mdi-account</v-icon>{{ userId }}
+          <v-tab
+            v-for="(selectedVal, userIndex) in selected"
+            v-bind:key="userIndex"
+          >
+            <v-icon left>mdi-account</v-icon
+            >{{ users.list.find(u => u.index == userIndex).email }}
           </v-tab>
 
-          <v-tab-item v-for="userId in users" v-bind:key="userId">
+          <v-tab-item
+            v-for="(selectedVal, userIndex) in selected"
+            v-bind:key="userIndex"
+          >
             <v-card flat>
-              <v-card-title>{{ userId }}</v-card-title>
+              <v-card-title
+                >{{ users.list.find(u => u.index == userIndex).email }}
+                {{
+                  currentUserEmail ==
+                  users.list.find(u => u.index == userIndex).email
+                    ? "(自分)"
+                    : "さん"
+                }}のジョハリの窓</v-card-title
+              >
               <v-card-text>
-                {{ selected[userId] }}
                 <v-row>
                   <v-col
-                    v-for="choice in choices.list"
-                    v-bind:key="choice.index"
+                    v-for="windowName in ['open', 'blind', 'hidden', 'unknown']"
+                    v-bind:key="windowName"
                     xs="12"
                     sm="12"
                     md="6"
                     lg="4"
                   >
                     <v-card>
-                      <v-checkbox
-                        v-model="selected[userId]"
-                        :label="choice.name"
-                        :value="choice.index"
-                      ></v-checkbox>
+                      <v-card-title primary-title>
+                        {{ windowInfo[windowName].title }}
+                      </v-card-title>
+                      <p
+                        v-for="(choiceCount, choiceIndex) in johariWindow[
+                          userIndex
+                        ][windowName]"
+                        v-bind:key="choiceIndex"
+                      >
+                        {{
+                          choices.list.find(c => c.index == choiceIndex).name
+                        }}({{ choiceCount }})
+                      </p>
                     </v-card>
                   </v-col>
                 </v-row>
@@ -36,11 +58,17 @@
             </v-card>
           </v-tab-item>
         </v-tabs>
-
-        <v-btn color="primary" @click="submit()">
-          回答終了
-        </v-btn>
       </v-card>
+      <v-btn outlined color="success" to="/johari-window/">
+        <v-icon left>mdi-plus-box</v-icon>一覧に戻る
+      </v-btn>
+      <v-btn
+        outlined
+        color="success"
+        :to="'/johari-window/' + $route.params.id + '/answer'"
+      >
+        <v-icon left>mdi-plus-box</v-icon> 回答する
+      </v-btn>
     </v-flex>
   </v-layout>
 </template>
@@ -49,71 +77,118 @@
 export default {
   data: () => {
     return {
-      users: ["A", "B", "C"],
-      choices: {
-        list: [
-          { index: 0, name: "あたまがいい" },
-          { index: 1, name: "やさしい" },
-          { index: 2, name: "威圧感がある" },
-          { index: 3, name: "頑固" },
-          { index: 4, name: "聞き上手" },
-          { index: 5, name: "話し上手" },
-          { index: 6, name: "人見知り" },
-          { index: 7, name: "謙虚" },
-          { index: 8, name: "傲慢" },
-          { index: 9, name: "正義感がある" },
-          { index: 10, name: "思いやりがある" }
-        ],
-        nextIndex: 11
+      johariWindow: [],
+      windowInfo: {
+        open: { title: "開放の窓", note: "自分も仲間も知っている事" },
+        blind: {
+          title: "盲点の窓",
+          note: "仲間は気づいているが、自分は知らない事"
+        },
+        hidden: {
+          title: "秘密の窓",
+          note: "自分は認識しているが、仲間は知らない事"
+        },
+        unknown: { title: "未知の窓", note: "誰も知らないこと" }
       },
-      selected: {
-        A: [],
-        B: [],
-        C: []
-      }
+      currentUserEmail: "",
+      title: "",
+      users: [],
+      choices: {},
+      selected: {}
     };
   },
   computed: {},
   async created() {
+    this.currentUserEmail = this.$store.state.user.email;
+
     const doc = await this.$store.dispatch("johariWindow/get", {
       context: this,
       id: this.$route.params.id
     });
     console.log("doc", doc);
+    this.title = doc.title;
     this.users = doc.users;
     this.choices = doc.choices;
     this.selected = doc.selected;
-  },
-  methods: {
-    async submit() {
-      var userIdList = this.users.list
-        .map(o => {
-          console.log(o);
 
-          return [o.userId];
-        })
-        .reduce((a, b) => {
-          console.log(a, b);
+    // 回答結果からジョハリの窓作成
+    // ターゲット：
+    //   open    自分： 知ってる 他人：知ってる
+    //   blind   自分： 知らない 他人：知っている
+    //   hidden  自分： 知ってる 他人：知らない
+    //   unknown 自分： 知らない 他人：知らない
+    let johariWindow = {};
 
-          return a.concat(b);
-        });
-      console.log(userIdList);
-
-      // データの登録
-      const res = await this.$store.dispatch("johariWindow/set", {
-        context: this,
-        doc: {
-          id: this.$route.params.id,
-          users: userIdList,
-          choices: this.choices,
-          selected: this.selected
+    for (const anserUserIndex in this.selected) {
+      // 自分の知っている一覧
+      let anserUserKnowChoice = this.selected[anserUserIndex][anserUserIndex];
+      // 他人の知っている一覧
+      let otherUserKnowChoice = [];
+      for (const otherUserIndex in this.selected) {
+        // 自分の場合はスキップ
+        if (anserUserIndex == otherUserIndex) continue;
+        otherUserKnowChoice = otherUserKnowChoice.concat(
+          this.selected[otherUserIndex][anserUserIndex]
+        );
+      }
+      console.log("自分の知っている一覧", anserUserKnowChoice);
+      console.log("他人の知っている一覧", otherUserKnowChoice);
+      let tmpJohariWindow = {
+        open: {},
+        blind: {},
+        hidden: {},
+        unknown: {}
+      };
+      anserUserKnowChoice.concat(otherUserKnowChoice).forEach(item => {
+        if (
+          anserUserKnowChoice.includes(item) &&
+          otherUserKnowChoice.includes(item)
+        ) {
+          //   open    自分： 知ってる 他人：知ってる
+          if (!tmpJohariWindow.open[item]) {
+            tmpJohariWindow.open[item] = 0;
+          }
+          tmpJohariWindow.open[item]++;
+        } else if (
+          !anserUserKnowChoice.includes(item) &&
+          otherUserKnowChoice.includes(item)
+        ) {
+          //   blind   自分： 知らない 他人：知っている
+          if (!tmpJohariWindow.blind[item]) {
+            tmpJohariWindow.blind[item] = 0;
+          }
+          tmpJohariWindow.blind[item]++;
+        } else if (
+          anserUserKnowChoice.includes(item) &&
+          !otherUserKnowChoice.includes(item)
+        ) {
+          //   hidden  自分： 知ってる 他人：知らない
+          if (!tmpJohariWindow.hidden[item]) {
+            tmpJohariWindow.hidden[item] = 0;
+          }
+          tmpJohariWindow.hidden[item]++;
+        }
+      });
+      //   unknown 自分： 知らない 他人：知らない
+      this.choices.list.forEach(choice => {
+        // const choice = this.choices.list[index];
+        if (
+          !anserUserKnowChoice
+            .concat(otherUserKnowChoice)
+            .includes(choice.index)
+        ) {
+          tmpJohariWindow.unknown[choice.index] = Object.keys(
+            this.selected
+          ).length;
         }
       });
 
-      // 詳細画面へ遷移
-      console.log("データ登録完了", res);
-      this.$router.push(`/johari-window/${this.$route.params.id}/`);
+      console.table(tmpJohariWindow);
+      johariWindow[anserUserIndex] = tmpJohariWindow;
     }
-  }
+    console.table("johariWindow", johariWindow);
+    this.johariWindow = johariWindow;
+  },
+  methods: {}
 };
 </script>

@@ -1,16 +1,6 @@
 import Vuex from "vuex";
 import { vuexfireMutations, firestoreAction } from "vuexfire";
 // const db = this.$fireStoreObj;
-console.log(this);
-/*
-
-johariWindow.{{id}}.
-
-{
-
-}
-
-*/
 
 export const state = () => ({
   list: []
@@ -24,8 +14,13 @@ export const actions = {
     console.log(context);
     return bindFirestoreRef(
       "list",
-      context.$fireStore.collection("johariWindowList")
-      //.where("users", "array-contains", "xxxxxxxxx")
+      context.$fireStore
+        .collection("johariWindowList")
+        .where(
+          "users.authorizationList",
+          "array-contains",
+          context.$store.state.user.email
+        )
     );
   }),
 
@@ -34,14 +29,23 @@ export const actions = {
     return await context.$fireStore.collection("johariWindowList").add(doc);
   }),
 
-  set: firestoreAction(async function({}, { context, doc }) {
+  // set: firestoreAction(async function({}, { context, doc }) {
+  //   console.log("johariWindowList:set", doc);
+  //   const id = doc.id;
+  //   delete doc.id;
+  //   return await context.$fireStore
+  //     .collection("johariWindowList")
+  //     .doc(id)
+  //     .set(doc);
+  // }),
+  update: firestoreAction(async function({}, { context, doc }) {
     console.log("johariWindowList:set", doc);
     const id = doc.id;
     delete doc.id;
     return await context.$fireStore
       .collection("johariWindowList")
       .doc(id)
-      .set(doc);
+      .update(doc);
   }),
 
   get: firestoreAction(async function({}, { context, id }) {
