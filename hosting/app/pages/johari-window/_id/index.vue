@@ -1,10 +1,10 @@
 <template>
   <v-layout column justify-center align-center>
-    <v-flex xs12 sm8 md6>
+    <v-flex xs12 sm12 md12 lg12>
       <v-card>
         <h1>『{{ title }}』の結果</h1>
 
-        <v-tabs vertical>
+        <v-tabs show-arrows>
           <v-tab
             v-for="(selectedVal, userIndex) in selected"
             v-bind:key="userIndex"
@@ -35,22 +35,46 @@
                     xs="12"
                     sm="12"
                     md="6"
-                    lg="4"
+                    lg="6"
                   >
-                    <v-card>
-                      <v-card-title primary-title>
-                        {{ windowInfo[windowName].title }}
-                      </v-card-title>
-                      <p
-                        v-for="(choiceCount, choiceIndex) in johariWindow[
-                          userIndex
-                        ][windowName]"
-                        v-bind:key="choiceIndex"
-                      >
-                        {{
-                          choices.list.find(c => c.index == choiceIndex).name
-                        }}({{ choiceCount }})
-                      </p>
+                    <v-card
+                      :color="windowInfo[windowName].background"
+                      min-height="200px"
+                    >
+                      <v-toolbar :color="windowInfo[windowName].bar">
+                        <v-spacer></v-spacer>
+                        <v-icon>{{ windowInfo[windowName].icon }}</v-icon>
+                        <v-toolbar-title>
+                          {{ windowInfo[windowName].title }}
+                        </v-toolbar-title>
+                        <v-spacer></v-spacer>
+                      </v-toolbar>
+                      <v-card-text>
+                        <v-row>
+                          <v-col
+                            v-for="(choiceCount, choiceIndex) in johariWindow[
+                              userIndex
+                            ][windowName]"
+                            v-bind:key="choiceIndex"
+                            xs="12"
+                            sm="12"
+                            md="6"
+                            lg="4"
+                          >
+                            <v-card color="#26c6da">
+                              <v-row>
+                                <v-col class="text-truncate text-center">
+                                  {{
+                                    choices.list.find(
+                                      c => c.index == choiceIndex
+                                    ).name
+                                  }}({{ choiceCount }})
+                                </v-col>
+                              </v-row>
+                            </v-card>
+                          </v-col>
+                        </v-row>
+                      </v-card-text>
                     </v-card>
                   </v-col>
                 </v-row>
@@ -79,22 +103,45 @@ export default {
     return {
       johariWindow: [],
       windowInfo: {
-        open: { title: "開放の窓", note: "自分も仲間も知っている事" },
+        open: {
+          title: "開放の窓",
+          note: "自分も仲間も知っている事",
+          background: "red lighten-5",
+          bar: "red accent-1",
+          choice: "red darken-",
+          icon: "mdi-human-greeting"
+        },
         blind: {
           title: "盲点の窓",
-          note: "仲間は気づいているが、自分は知らない事"
+          note: "仲間は気づいているが、自分は知らない事",
+          background: "yellow lighten-4",
+          bar: "yellow accent-1",
+          choice: "orange  darken-",
+          icon: "mdi-eye"
         },
         hidden: {
           title: "秘密の窓",
-          note: "自分は認識しているが、仲間は知らない事"
+          note: "自分は認識しているが、仲間は知らない事",
+          background: "green  lighten-5",
+          bar: "green accent-1",
+          choice: "green darken-",
+          icon: "mdi-shield"
         },
-        unknown: { title: "未知の窓", note: "誰も知らないこと" }
+        unknown: {
+          title: "未知の窓",
+          note: "誰も知らないこと",
+          background: "blue lighten-5",
+          bar: "blue accent-1",
+          choice: "blue darken-",
+          icon: "mdi-earth"
+        }
       },
       currentUserEmail: "",
       title: "",
       users: [],
       choices: {},
-      selected: {}
+      selected: {},
+      unansweredUsers: {}
     };
   },
   computed: {},
@@ -110,6 +157,16 @@ export default {
     this.users = doc.users;
     this.choices = doc.choices;
     this.selected = doc.selected;
+
+    // 未回答ユーザー
+    const userIds = this.users.list.map(u => {
+      u.id;
+    });
+    for (const userId in this.userIds) {
+      if (!Object.keys(this.selected).includes(userId)) {
+        this.unansweredUsers.push(userId);
+      }
+    }
 
     // 回答結果からジョハリの窓作成
     // ターゲット：
