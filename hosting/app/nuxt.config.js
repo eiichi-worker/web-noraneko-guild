@@ -76,12 +76,12 @@ export default {
     services: {
       auth: {
         initialize: {
-          onAuthStateChangedMutation: 'ON_AUTH_STATE_CHANGED_MUTATION',
+          onAuthStateChangedMutation: "ON_AUTH_STATE_CHANGED_MUTATION"
           // onAuthStateChangedAction: 'onAuthStateChangedAction'
         }
       },
       firestore: true,
-      functions: true,
+      functions: true
       // storage: false,
       // realtimeDb: false,
       // performance: false,

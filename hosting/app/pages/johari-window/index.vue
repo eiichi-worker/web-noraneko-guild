@@ -5,9 +5,27 @@
         <v-icon left>mdi-plus-box</v-icon> 新しくジョハリの窓を始める
       </v-btn>
 
-      <v-card v-for="item of list" :key="item.id">
-        <!-- <p>{{ item.id }}</p> -->
-        <a :href="'/johari-window/' + item.id">{{ item.title }}</a>
+      <v-card>
+        <v-list two-line subheader>
+          <v-list-item
+            v-for="item in list"
+            :key="item.id"
+            :to="'/johari-window/' + item.id"
+          >
+            <v-list-item-content>
+              <v-list-item-title v-text="item.title"></v-list-item-title>
+              <v-list-item-subtitle
+                v-text="dateFormat(item.timestamp)"
+              ></v-list-item-subtitle>
+            </v-list-item-content>
+
+            <!-- <v-list-item-action>
+              <v-btn icon>
+                <v-icon color="grey lighten-1">mdi-information</v-icon>
+              </v-btn>
+            </v-list-item-action> -->
+          </v-list-item>
+        </v-list>
       </v-card>
     </v-flex>
   </v-layout>
@@ -15,6 +33,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { DateTime } from "luxon";
 
 export default {
   computed: {
@@ -24,6 +43,14 @@ export default {
     // console.log(this);
     this.$store.dispatch("johariWindow/bindList", this);
     console.log(this.list);
+  },
+  methods: {
+    dateFormat: function(timestamp) {
+      console.log(timestamp);
+      return DateTime.fromSeconds(timestamp.seconds).toFormat(
+        "y/LL/dd HH:mm:ss"
+      );
+    }
   }
 };
 </script>
