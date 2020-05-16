@@ -81,11 +81,11 @@ export default {
         }
       },
       firestore: true,
-      functions: true
+      functions: true,
       // storage: false,
       // realtimeDb: false,
       // performance: false,
-      // analytics: false,
+      analytics: true,
       // remoteConfig: false,
       // messaging: false
     }
