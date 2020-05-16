@@ -48,6 +48,12 @@
                           {{ windowInfo[windowName].title }}
                         </v-toolbar-title>
                         <v-spacer></v-spacer>
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on }">
+                            <v-icon v-on="on">mdi-information-outline</v-icon>
+                          </template>
+                          <span> {{ windowInfo[windowName].note }}</span>
+                        </v-tooltip>
                       </v-toolbar>
                       <v-card-text>
                         <v-row>
@@ -61,15 +67,41 @@
                             md="6"
                             lg="4"
                           >
-                            <v-card color="#26c6da">
+                            <v-card
+                              :color="
+                                windowInfo[windowName].choice +
+                                  getGradationNo({ count: choiceCount })
+                              "
+                            >
                               <v-row>
-                                <v-col class="text-truncate text-center">
-                                  {{
-                                    choices.list.find(
-                                      c => c.index == choiceIndex
-                                    ).name
-                                  }}({{ choiceCount }})
-                                </v-col>
+                                <v-tooltip bottom>
+                                  <template v-slot:activator="{ on }">
+                                    <v-col
+                                      class="text-truncate text-center white--text"
+                                      v-on="on"
+                                    >
+                                      {{
+                                        choices.list.find(
+                                          c => c.index == choiceIndex
+                                        ).name
+                                      }}
+                                    </v-col>
+                                  </template>
+                                  <span>
+                                    {{
+                                      choices.list.find(
+                                        c => c.index == choiceIndex
+                                      ).name
+                                    }}</span
+                                  >
+                                  <span
+                                    v-if="
+                                      windowName == 'open' ||
+                                        windowName == 'blind'
+                                    "
+                                    >({{ choiceCount }})</span
+                                  >
+                                </v-tooltip>
                               </v-row>
                             </v-card>
                           </v-col>
@@ -79,20 +111,22 @@
                   </v-col>
                 </v-row>
               </v-card-text>
+              <v-card-text>
+                <v-btn outlined color="" to="/johari-window/">
+                  <v-icon left>mdi-arrow-left</v-icon>一覧に戻る
+                </v-btn>
+                <v-btn
+                  outlined
+                  color="success"
+                  :to="'/johari-window/' + $route.params.id + '/answer'"
+                >
+                  <v-icon left>mdi-pencil</v-icon> 回答する
+                </v-btn>
+              </v-card-text>
             </v-card>
           </v-tab-item>
         </v-tabs>
       </v-card>
-      <v-btn outlined color="success" to="/johari-window/">
-        <v-icon left>mdi-plus-box</v-icon>一覧に戻る
-      </v-btn>
-      <v-btn
-        outlined
-        color="success"
-        :to="'/johari-window/' + $route.params.id + '/answer'"
-      >
-        <v-icon left>mdi-plus-box</v-icon> 回答する
-      </v-btn>
     </v-flex>
   </v-layout>
 </template>
@@ -138,13 +172,12 @@ export default {
       },
       currentUserEmail: "",
       title: "",
-      users: [],
+      users: {},
       choices: {},
       selected: {},
       unansweredUsers: {}
     };
   },
-  computed: {},
   async created() {
     this.currentUserEmail = this.$store.state.user.email;
 
@@ -246,6 +279,23 @@ export default {
     console.table("johariWindow", johariWindow);
     this.johariWindow = johariWindow;
   },
-  methods: {}
+  computed: {},
+  methods: {
+    /**
+     * 4段階のグラデーションのために回答者数と回答数からグラデーションを決定する
+     */
+    getGradationNo: function({ count }) {
+      const userCount = this.users.list.length;
+      const countRate = count / userCount;
+      const gradationNo = Math.ceil(4 * countRate);
+      console.log("getGradationNo", {
+        userCount,
+        countRate,
+        gradationNo
+      });
+
+      return gradationNo;
+    }
+  }
 };
 </script>
