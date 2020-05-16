@@ -133,6 +133,9 @@
 
 <script>
 export default {
+  head: {
+    title: "結果 | ジョハリの窓"
+  },
   data: () => {
     return {
       johariWindow: [],
@@ -185,7 +188,7 @@ export default {
       context: this,
       id: this.$route.params.id
     });
-    console.log("doc", doc);
+    // console.log("doc", doc);
     this.title = doc.title;
     this.users = doc.users;
     this.choices = doc.choices;
@@ -221,8 +224,8 @@ export default {
           this.selected[otherUserIndex][anserUserIndex]
         );
       }
-      console.log("自分の知っている一覧", anserUserKnowChoice);
-      console.log("他人の知っている一覧", otherUserKnowChoice);
+      // console.log("自分の知っている一覧", anserUserKnowChoice);
+      // console.log("他人の知っている一覧", otherUserKnowChoice);
       let tmpJohariWindow = {
         open: {},
         blind: {},
@@ -273,10 +276,10 @@ export default {
         }
       });
 
-      console.table(tmpJohariWindow);
+      // console.table(tmpJohariWindow);
       johariWindow[anserUserIndex] = tmpJohariWindow;
     }
-    console.table("johariWindow", johariWindow);
+    // console.table("johariWindow", johariWindow);
     this.johariWindow = johariWindow;
   },
   computed: {},
@@ -288,11 +291,11 @@ export default {
       const userCount = this.users.list.length;
       const countRate = count / userCount;
       const gradationNo = Math.ceil(4 * countRate);
-      console.log("getGradationNo", {
-        userCount,
-        countRate,
-        gradationNo
-      });
+      // console.log("getGradationNo", {
+      //   userCount,
+      //   countRate,
+      //   gradationNo
+      // });
 
       return gradationNo;
     }

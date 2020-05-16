@@ -96,6 +96,9 @@
 import { mapGetters } from "vuex";
 
 export default {
+  head: {
+    title: "新規作成 | ジョハリの窓"
+  },
   data: () => {
     return {
       title: "新しいジョハリの窓",
@@ -127,7 +130,7 @@ export default {
   created() {
     // console.log(this);
     this.$store.dispatch("johariWindow/bindList", this);
-    console.log(this.list);
+    // console.log(this.list);
   },
 
   methods: {
@@ -136,7 +139,7 @@ export default {
         index: this.users.nextIndex++,
         email: ""
       });
-      console.log(this.users);
+      // console.log(this.users);
     },
     deleteUserField(index) {
       this.users.list.splice(index, 1);
@@ -149,7 +152,7 @@ export default {
         index: this.choices.nextIndex++,
         name: ""
       });
-      console.log(this.users);
+      // console.log(this.users);
     },
     deleteChoiceField(index) {
       this.choices.list.splice(index, 1);
@@ -191,7 +194,7 @@ export default {
         return o.email;
       });
 
-      console.log("this.users.authorizationList", this.users.authorizationList);
+      // console.log("this.users.authorizationList", this.users.authorizationList);
 
       // データの登録
       const res = await this.$store.dispatch("johariWindow/add", {
@@ -205,7 +208,7 @@ export default {
       });
 
       // 詳細画面へ遷移
-      console.log("データ登録完了", res);
+      // console.log("データ登録完了", res);
       this.$router.push(`/johari-window/${res.id}/answer/`);
     }
   }

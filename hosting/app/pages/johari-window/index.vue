@@ -36,6 +36,9 @@ import { mapGetters } from "vuex";
 import { DateTime } from "luxon";
 
 export default {
+  head: {
+    title: "一覧 | ジョハリの窓"
+  },
   computed: {
     ...mapGetters({ list: "johariWindow/list" })
   },

@@ -68,6 +68,9 @@
 
 <script>
 export default {
+  head: {
+    title: "回答 | ジョハリの窓"
+  },
   data: () => {
     return {
       currentUserEmail: "",
@@ -91,7 +94,7 @@ export default {
       context: this,
       id: this.$route.params.id
     });
-    console.log("doc", doc);
+    // console.log("doc", doc);
     this.title = doc.title;
     this.users = doc.users;
     this.choices = doc.choices;
@@ -124,7 +127,7 @@ export default {
       });
 
       // 詳細画面へ遷移
-      console.log("データ登録完了", res);
+      // console.log("データ登録完了", res);
       this.$router.push(`/johari-window/${this.$route.params.id}/`);
     }
   }

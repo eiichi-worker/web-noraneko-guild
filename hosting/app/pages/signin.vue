@@ -11,6 +11,9 @@
 import SignIn from "~/components/SignIn.vue";
 
 export default {
+  head: {
+    title: "サインイン"
+  },
   computed: {
     currentUser() {
       return this.$store.state.user;
