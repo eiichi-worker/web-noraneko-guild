@@ -1,37 +1,25 @@
 <template>
   <div class="text-center">
     <h1>
-      Welcome <span v-if="currentUser">{{ currentUser.displayName }}</span>
+      ようこそ! <span v-if="currentUser">{{ currentUser.displayName }}さん!</span>
     </h1>
-    <sign-in />
-    <div v-if="currentUser">
-      <button type="button" class="btn btn-primary" @click="signOut">
-        Sign Out
-      </button>
-    </div>
 
-    仲間を知ることで生まれる尊敬・尊重・信頼とコラボレーション
+    <h2>仲間と成長するツールボックス「ノラネコギルド」</h2>
+    <p>
+      ノラネコギルドは、仲間を知り、HRT（謙虚・尊敬・信頼）を築き、継続的に成長し、成果を出せるチームを作るためのツールです。<br />
+    世の中のプラクティスを使いやすく整理し、結果をいつでも見れるようにします。<br />
+    </p>
+    <p v-if="!currentUser">まずは<a href="/signin">サインイン</a>しましょう！</p>
     <a href="/johari-window/" target="">ジョハリの窓</a>
   </div>
 </template>
 
 <script>
-import SignIn from "~/components/SignIn.vue";
-
 export default {
   computed: {
     currentUser() {
       return this.$store.state.user;
     }
-  },
-  methods: {
-    signOut() {
-      console.log("signOut");
-      this.$fireAuth.signOut();
-    }
-  },
-  components: {
-    SignIn
   }
 };
 </script>

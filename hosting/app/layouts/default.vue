@@ -46,6 +46,33 @@
       </v-btn> -->
       <v-toolbar-title v-text="title" />
       <v-spacer />
+      <!-- ユーザー -->
+
+      <v-menu offset-y v-if="currentUser">
+        <template v-slot:activator="{ on }">
+          <v-btn text v-on="on">
+            {{ currentUser.email }}
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item
+            v-for="(item, index) in userMenue"
+            :key="index"
+            :to="item.to"
+            @click="item.click"
+          >
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="signOut">
+            <v-list-item-title>サインアウト</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+
+      <v-btn text v-if="currentUser == false" to="/signin">
+        サインイン
+      </v-btn>
       <!-- <v-btn
         icon
         @click.stop="rightDrawer = !rightDrawer"
@@ -95,9 +122,16 @@ export default {
           to: "/"
         },
         {
-          icon: "mdi-chart-bubble",
+          icon: "mdi-window-closed-variant",
           title: "ジョハリの窓",
           to: "/johari-window/"
+        }
+      ],
+      userMenue: [
+        {
+          icon: "mdi-window-closed-variant",
+          title: "ユーザー設定",
+          to: "/"
         }
       ],
       miniVariant: false,
@@ -105,6 +139,17 @@ export default {
       rightDrawer: false,
       title: "ノラネコギルド"
     };
+  },
+  computed: {
+    currentUser: function() {
+      return this.$store.state.user;
+    }
+  },
+  methods: {
+    signOut() {
+      console.log("signOut");
+      this.$fireAuth.signOut();
+    }
   }
 };
 </script>
