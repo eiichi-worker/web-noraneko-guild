@@ -38,7 +38,7 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: ["@nuxtjs/firebase"],
+  modules: ["@nuxtjs/firebase", "@nuxtjs/sitemap"],
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module
@@ -69,7 +69,8 @@ export default {
       projectId: "noraneko-guild",
       storageBucket: "noraneko-guild.appspot.com",
       messagingSenderId: "557661961189",
-      appId: "1:557661961189:web:1c3c0769c53934f4920d0c"
+      appId: "1:557661961189:web:1c3c0769c53934f4920d0c",
+      measurementId: "G-MXBVTCP68J"
     },
     // customEnv: false,
     // onFirebaseHosting: false,
@@ -85,10 +86,16 @@ export default {
       // storage: false,
       // realtimeDb: false,
       // performance: false,
-      analytics: true,
+      analytics: true
       // remoteConfig: false,
       // messaging: false
     }
+  },
+  sitemap: {
+    path: "/sitemap.xml",
+    hostname: "https://guild.noraneko.work",
+    // generate: true,
+    exclude: ["/johari-window"]
   },
   /*
    ** Build configuration
