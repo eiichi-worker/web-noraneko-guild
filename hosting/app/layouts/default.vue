@@ -102,7 +102,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer> -->
-    <v-footer :fixed="fixed" app>
+    <v-footer>
       <span>&copy; {{ new Date().getFullYear() }} ノラネコ技術工房</span>
     </v-footer>
   </v-app>
