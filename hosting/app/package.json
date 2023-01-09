@@ -15,7 +15,7 @@
     "@nuxtjs/sitemap": "^2.3.0",
     "firebase": "^7.14.3",
     "firebaseui": "^4.5.0",
-    "luxon": "^1.24.1",
+    "luxon": "^2.5.2",
     "nuxt": "^2.12.2",
     "vuexfire": "^3.2.2"
   },
